@@ -17,3 +17,54 @@
     border-color: var(--color-gray-200, currentColor);
   }
 }
+:root {
+  --bg: #05060A;
+  --panel: rgba(255, 255, 255, 0.06);
+  --panel-2: rgba(0, 0, 0, 0.35);
+  --stroke: rgba(255, 255, 255, 0.12);
+  --stroke-2: rgba(255, 255, 255, 0.08);
+}
+
+html, body {
+  background: var(--bg);
+}
+
+body {
+  color: white;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.fusion-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  pointer-events: none;
+  background:
+    radial-gradient(900px 500px at 50% -10%, rgba(59,130,246,0.22), transparent 60%),
+    radial-gradient(700px 500px at 110% 30%, rgba(249,115,22,0.14), transparent 55%),
+    radial-gradient(700px 600px at -10% 70%, rgba(34,211,238,0.10), transparent 55%),
+    radial-gradient(900px 700px at 50% 120%, rgba(99,102,241,0.10), transparent 60%);
+}
+
+/* Glass card utility (Framer-like) */
+.fusion-card {
+  background: var(--panel);
+  border: 1px solid var(--stroke);
+  border-radius: 24px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Premium glow shadows */
+.fusion-glow {
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.07),
+    0 35px 140px rgba(37,99,235,0.16);
+}
+
+.fusion-glow2 {
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.06),
+    0 35px 140px rgba(249,115,22,0.12);
+}
