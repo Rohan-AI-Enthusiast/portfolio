@@ -2,7 +2,14 @@
 
 import { motion } from "framer-motion";
 
-const badges = ["AI Product", "Automation Systems", "Applied GenAI", "Outbound Intelligence"];
+type Badge = { label: string };
+
+const heroBadges: Badge[] = [
+  { label: "AI Product" },
+  { label: "Automation Systems" },
+  { label: "Applied GenAI" },
+  { label: "Outbound Intelligence" },
+];
 
 export function Hero() {
   return (
@@ -17,18 +24,19 @@ export function Hero() {
           <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
             AI systems that feel like a product, not a demo
           </h1>
+
           <p className="mt-4 max-w-xl text-base leading-7 text-white/70">
-            I design and build automation driven workflows with clear reasoning, measurable impact, and
-            a clean UI layer on top.
+            I design and build automation driven workflows with clear reasoning,
+            measurable impact, and a clean UI layer on top.
           </p>
 
           <div className="mt-6 flex flex-wrap gap-2">
-            {badges.map((b) => (
+            {heroBadges.map((b) => (
               <span
-                key={b}
+                key={b.label}
                 className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/75"
               >
-                {b}
+                {b.label}
               </span>
             ))}
           </div>
@@ -42,7 +50,7 @@ export function Hero() {
             </a>
             <a
               href="#contact"
-              className="rounded-xl border border-white/12 bg-white/5 px-4 py-2 text-sm font-medium text-white/85 hover:bg-white/8"
+              className="rounded-xl border border-white/12 bg-white/5 px-4 py-2 text-sm font-medium text-white/85 hover:bg-white/10"
             >
               Contact
             </a>
@@ -50,27 +58,43 @@ export function Hero() {
         </div>
 
         <div className="relative">
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.06),_0_25px_120px_rgba(37,99,235,0.12)] backdrop-blur">
+          <div className="fusion-card fusion-glow p-6 md:p-8">
             <div className="flex items-center justify-between">
-              <div className="text-sm font-medium text-white/85">Proactive Outbound Intelligence</div>
+              <div className="text-sm font-medium text-white/85">
+                Proactive Outbound Intelligence
+              </div>
               <div className="text-xs text-white/50">V1</div>
             </div>
 
             <div className="mt-4 grid grid-cols-2 gap-3">
-              <Card title="Lead scoring" desc="Consistent scoring rules across channels." />
-              <Card title="Research briefs" desc="Fast context to personalize outreach." />
-              <Card title="Pipeline view" desc="MQL to SQL tracking and notes." />
-              <Card title="Cost control" desc="Token and run cost visibility." />
+              <FeatureCard
+                title="Lead scoring"
+                desc="Consistent scoring rules across channels."
+              />
+              <FeatureCard
+                title="Research briefs"
+                desc="Fast context to personalize outreach."
+              />
+              <FeatureCard
+                title="Pipeline view"
+                desc="MQL to SQL tracking and notes."
+              />
+              <FeatureCard
+                title="Cost control"
+                desc="Token and run cost visibility."
+              />
             </div>
           </div>
 
           <motion.div
-            className="absolute -left-6 -top-6 hidden w-[240px] rounded-2xl border border-white/10 bg-black/40 p-4 backdrop-blur lg:block"
+            className="fusion-card absolute -left-6 -top-6 hidden w-[240px] p-4 lg:block"
             animate={{ y: [0, -10, 0] }}
             transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
           >
             <div className="text-xs text-white/60">Signal</div>
-            <div className="mt-1 text-sm font-medium text-white/85">High intent account detected</div>
+            <div className="mt-1 text-sm font-medium text-white/85">
+              High intent account detected
+            </div>
             <div className="mt-3 h-2 w-full rounded-full bg-white/10">
               <div className="h-2 w-[72%] rounded-full bg-blue-500/60" />
             </div>
@@ -78,12 +102,14 @@ export function Hero() {
           </motion.div>
 
           <motion.div
-            className="absolute -bottom-6 -right-3 hidden w-[260px] rounded-2xl border border-white/10 bg-black/40 p-4 backdrop-blur lg:block"
+            className="fusion-card fusion-glow2 absolute -bottom-6 -right-3 hidden w-[260px] p-4 lg:block"
             animate={{ y: [0, 12, 0] }}
             transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
           >
             <div className="text-xs text-white/60">Draft</div>
-            <div className="mt-1 text-sm font-medium text-white/85">Message personalization ready</div>
+            <div className="mt-1 text-sm font-medium text-white/85">
+              Message personalization ready
+            </div>
             <div className="mt-3 space-y-2">
               <div className="h-2 w-[92%] rounded bg-white/10" />
               <div className="h-2 w-[84%] rounded bg-white/10" />
@@ -98,9 +124,9 @@ export function Hero() {
   );
 }
 
-function Card(props: { title: string; desc: string }) {
+function FeatureCard(props: { title: string; desc: string }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/4 p-4">
+    <div className="fusion-card p-4">
       <div className="text-sm font-medium text-white/85">{props.title}</div>
       <div className="mt-1 text-xs leading-5 text-white/55">{props.desc}</div>
     </div>
