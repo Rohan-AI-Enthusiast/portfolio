@@ -66,7 +66,7 @@ export function StickyShowcase() {
     return () => observers.forEach((o) => o.disconnect());
   }, [items]);
 
-  const activeItem = items.find((x) => x.id === active) ?? items[0];
+  const activeItem = items.find((x) => x.id === active) ?? items[0]!;
 
   return (
     <section className="py-16">
