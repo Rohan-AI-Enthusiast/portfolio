@@ -8,7 +8,7 @@ type Item = {
   title: string;
   desc: string;
   bullets: string[];
-}; 
+};
 
 export function StickyShowcase() {
   const items: Item[] = useMemo(
@@ -47,21 +47,21 @@ export function StickyShowcase() {
   useEffect(() => {
     const observers: IntersectionObserver[] = [];
 
-    items.forEach((it) => {
+    for (const it of items) {
       const el = sectionRefs.current[it.id];
-      if (!el) return;
+      if (!el) continue;
 
       const obs = new IntersectionObserver(
         (entries) => {
           const e = entries[0];
           if (e && e.isIntersecting) setActive(it.id);
         },
-        { root: null, threshold: 0.55 }
+        { threshold: 0.55 }
       );
 
       obs.observe(el);
       observers.push(obs);
-    });
+    }
 
     return () => observers.forEach((o) => o.disconnect());
   }, [items]);
@@ -72,7 +72,7 @@ export function StickyShowcase() {
     <section className="py-16">
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
         <div className="lg:sticky lg:top-24 lg:h-[520px]">
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.06),_0_25px_120px_rgba(37,99,235,0.12)] backdrop-blur">
+          <div className="fusion-card fusion-glow p-6">
             <div className="text-xs text-white/55">System view</div>
 
             <div className="mt-3 min-h-[220px]">
@@ -84,12 +84,19 @@ export function StickyShowcase() {
                   exit={{ opacity: 0, y: -10, filter: "blur(8px)" }}
                   transition={{ duration: 0.35 }}
                 >
-                  <div className="text-lg font-semibold text-white/90">{activeItem.title}</div>
-                  <div className="mt-2 text-sm leading-6 text-white/65">{activeItem.desc}</div>
+                  <div className="text-lg font-semibold text-white/90">
+                    {activeItem.title}
+                  </div>
+                  <div className="mt-2 text-sm leading-6 text-white/65">
+                    {activeItem.desc}
+                  </div>
 
                   <div className="mt-5 grid grid-cols-2 gap-3">
                     {activeItem.bullets.map((b) => (
-                      <div key={b} className="rounded-2xl border border-white/10 bg-black/30 px-3 py-2 text-xs text-white/70">
+                      <div
+                        key={b}
+                        className="rounded-2xl border border-white/10 bg-black/30 px-3 py-2 text-xs text-white/70"
+                      >
                         {b}
                       </div>
                     ))}
@@ -103,7 +110,9 @@ export function StickyShowcase() {
               <div className="mt-2 h-2 w-full rounded-full bg-white/10">
                 <div
                   className="h-2 rounded-full bg-blue-500/60"
-                  style={{ width: `${(items.findIndex((x) => x.id === active) + 1) * 25}%` }}
+                  style={{
+                    width: `${(items.findIndex((x) => x.id === active) + 1) * 25}%`,
+                  }}
                 />
               </div>
             </div>
@@ -117,13 +126,17 @@ export function StickyShowcase() {
               ref={(el) => {
                 sectionRefs.current[it.id] = el;
               }}
-              className="rounded-3xl border border-white/10 bg-white/5 p-7"
+              className="fusion-card p-7"
             >
               <div className="text-sm font-medium text-white/85">{it.title}</div>
               <div className="mt-2 text-sm leading-6 text-white/60">{it.desc}</div>
+
               <ul className="mt-4 grid grid-cols-1 gap-2 text-sm text-white/55">
                 {it.bullets.map((b) => (
-                  <li key={b} className="rounded-xl border border-white/10 bg-black/25 px-3 py-2">
+                  <li
+                    key={b}
+                    className="rounded-xl border border-white/10 bg-black/25 px-3 py-2"
+                  >
                     {b}
                   </li>
                 ))}
