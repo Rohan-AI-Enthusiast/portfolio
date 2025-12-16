@@ -8,7 +8,7 @@ type Item = {
   title: string;
   desc: string;
   bullets: string[];
-};
+}; 
 
 export function StickyShowcase() {
   const items: Item[] = useMemo(
