@@ -9,7 +9,8 @@ import { Footer } from "@/components/fusion/footer";
 
 export default function Page() {
   return (
-    <main className="min-h-screen bg-[#05060A] text-white">
+    <main className="min-h-screen bg-[#05060A] text-white">  
+      <div className="fusion-bg" />
       <div className="pointer-events-none fixed inset-0 -z-10">
         <div className="absolute left-1/2 top-[-200px] h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-blue-500/20 blur-[120px]" />
         <div className="absolute right-[-160px] top-[140px] h-[520px] w-[520px] rounded-full bg-orange-500/15 blur-[130px]" />
