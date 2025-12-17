@@ -51,7 +51,7 @@ export function Hero() {
                   {/* Keep aspect ratio, then fill with Image */}
                   <div className="relative aspect-[3/4] w-full">
                     <Image
-                      src="/rohan.jpg"
+                      src="/rohan.png"
                       alt="Rohan portrait"
                       fill
                       priority
