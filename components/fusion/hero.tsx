@@ -58,12 +58,17 @@ export function Hero() {
                       className="object-cover"
                       sizes="(max-width: 768px) 260px, 320px"
                     />
-
-                    {/* Subtle dark overlay for premium look on dark UI */}
-                    <div className="pointer-events-none absolute inset-0 bg-black/15" />
-
+                    {/* Soft dark wash */}
+                    <div className="pointer-events-none absolute inset-0 bg-black/25" />
+                    
+                    {/* Color tint matching hero lighting */}
+                    <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_70%_25%,rgba(59,130,246,0.22),transparent_55%),radial-gradient(circle_at_20%_35%,rgba(249,115,22,0.16),transparent_55%)]" />
+                    
+                    {/* Vignette to embed edges */}
+                    <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_55%,transparent_45%,rgba(0,0,0,0.45)_100%)]" />
+                    
                     {/* Subtle highlight */}
-                    <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.14),transparent_45%)]" />
+                    <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.10),transparent_45%)]" />        
                   </div>
                 </div>
 
