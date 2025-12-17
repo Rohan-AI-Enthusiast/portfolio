@@ -75,6 +75,13 @@ body {
   border-radius: 28px;
 }
 
+.fusion-hero-bg {
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+  isolation: isolate;
+}
+
 .fusion-hero-bg::before {
   content: "";
   position: absolute;
@@ -82,17 +89,18 @@ body {
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(900px 520px at 10% 35%, rgba(249,115,22,0.22), transparent 62%),
-    radial-gradient(1100px 760px at 88% 28%, rgba(59,130,246,0.24), transparent 60%),
-    radial-gradient(900px 760px at 70% 90%, rgba(99,102,241,0.12), transparent 62%),
-    linear-gradient(180deg, rgba(0,0,0,0.10), rgba(0,0,0,0.55));
-  filter: saturate(1.05);
+    radial-gradient(900px 520px at 12% 35%, rgba(249,115,22,0.28), transparent 62%),
+    radial-gradient(1100px 760px at 88% 28%, rgba(59,130,246,0.34), transparent 60%),
+    radial-gradient(900px 760px at 72% 92%, rgba(99,102,241,0.18), transparent 62%),
+    radial-gradient(700px 520px at 70% 40%, rgba(34,211,238,0.10), transparent 62%),
+    linear-gradient(180deg, rgba(0,0,0,0.08), rgba(0,0,0,0.62));
+  filter: saturate(1.2) contrast(1.05);
 }
 
 .fusion-hero-bg::after {
   content: "";
   position: absolute;
-  inset: -20%;
+  inset: -30%;
   z-index: 1;
   pointer-events: none;
   transform: rotate(-18deg);
@@ -101,20 +109,19 @@ body {
       90deg,
       rgba(59,130,246,0.00) 0px,
       rgba(59,130,246,0.00) 34px,
-      rgba(59,130,246,0.10) 58px,
-      rgba(59,130,246,0.00) 92px
-    ),
-    repeating-linear-gradient(
-      90deg,
-      rgba(59,130,246,0.00) 0px,
-      rgba(59,130,246,0.00) 64px,
-      rgba(59,130,246,0.06) 92px,
-      rgba(59,130,246,0.00) 140px
+      rgba(59,130,246,0.16) 58px,
+      rgba(59,130,246,0.00) 96px
     );
-  opacity: 0.9;
-  filter: blur(0.2px);
+  opacity: 0.95;
+  filter: blur(0.4px);
   mask-image: radial-gradient(closest-side at 78% 45%, rgba(0,0,0,1), rgba(0,0,0,0));
 }
+
+.fusion-hero-inner {
+  position: relative;
+  z-index: 2;
+}
+
 
 .fusion-hero-inner {
   position: relative;
