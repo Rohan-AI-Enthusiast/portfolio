@@ -1,88 +1,93 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
+import Image from "next/image";
+import Link from "next/link";
 
-export function Hero() {
+export default function Hero() {
   return (
-    <section className="relative min-h-[100svh] bg-[#07080b]">
-      {/* Background glow */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -left-32 top-10 h-[520px] w-[520px] rounded-full bg-orange-500/10 blur-[120px]" />
-        <div className="absolute -right-32 top-0 h-[620px] w-[620px] rounded-full bg-blue-500/12 blur-[140px]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_10%,rgba(255,255,255,0.06),transparent_55%)]" />
-      </div>
+    <section className="relative min-h-screen overflow-hidden">
+      {/* Background */}
+      <div className="absolute inset-0 bg-[radial-gradient(1200px_600px_at_20%_20%,rgba(234,88,12,0.25),transparent_60%),radial-gradient(1200px_600px_at_80%_30%,rgba(37,99,235,0.25),transparent_60%),#050505]" />
 
-      <div className="relative mx-auto max-w-6xl px-6 pt-28 pb-24">
-        <div className="grid grid-cols-12 items-center gap-10">
-          {/* Left typography */}
-          <div className="col-span-6">
-            <div className="text-xs font-semibold tracking-[0.22em] text-white/60">
+      {/* Content */}
+      <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl items-center px-6">
+        <div className="grid w-full grid-cols-1 items-center gap-12 md:grid-cols-3">
+          {/* LEFT */}
+          <div>
+            <p className="mb-3 text-xs tracking-widest text-white/50">
               ROHAN JETHA
-            </div>
+            </p>
 
-            <h1 className="mt-6 text-[72px] font-semibold leading-[0.92] tracking-tight text-white">
+            <h1 className="text-5xl font-semibold leading-tight text-white md:text-6xl">
               AI
               <br />
               PRODUCT
             </h1>
 
-            <p className="mt-5 max-w-md text-sm leading-relaxed text-white/70">
-              I build AI enabled products with crisp problem framing, measurable outcomes,
-              and practical execution.
+            <p className="mt-6 max-w-md text-sm text-white/70">
+              I build AI-enabled products with crisp problem framing,
+              measurable outcomes, and practical execution.
             </p>
 
-            <div className="mt-8 flex items-center gap-3">
+            <div className="mt-8 flex gap-3">
               <Link
-                href="#capabilities"
-                className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-black"
+                href="#projects"
+                className="rounded-full bg-white px-5 py-2 text-sm font-medium text-black"
               >
                 View work
               </Link>
               <Link
                 href="#contact"
-                className="rounded-full border border-white/15 bg-white/5 px-5 py-2 text-sm font-semibold text-white/85 backdrop-blur"
+                className="rounded-full border border-white/20 px-5 py-2 text-sm text-white"
               >
                 Contact
               </Link>
             </div>
           </div>
 
-          {/* Right typography */}
-          <div className="col-span-6 text-right">
+          {/* CENTER IMAGE */}
+          <div className="relative flex justify-center">
             <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="inline-block"
+              initial={{ rotate: -6, y: 20 }}
+              animate={{ rotate: -2, y: 0 }}
+              transition={{ duration: 1.2, ease: "easeOut" }}
+              className="relative"
             >
-              <div className="text-[72px] font-semibold leading-[0.92] tracking-tight text-white/90">
-                SYSTEMS
-              </div>
-              <div className="mt-3 max-w-sm text-sm leading-relaxed text-white/60 ml-auto">
-                Roadmaps, experimentation, LLM workflows, and shipping discipline.
-                Less hype, more outcomes.
-              </div>
-            </motion.div>
-          </div>
-        </div>
+              <Image
+                src="/rohan.png"
+                alt="Rohan Jetha"
+                width={420}
+                height={560}
+                priority
+                className="rounded-2xl"
+              />
 
-        {/* Waving button placeholder (kept simple for now) */}
-        <div className="relative mt-16 h-10">
-          <div className="absolute left-1/2 top-0 -translate-x-1/2">
-            <div className="grid h-14 w-14 place-items-center rounded-full bg-indigo-500 shadow-[0_18px_55px_rgba(99,102,241,0.35)]">
-              <motion.span
-                className="text-2xl"
-                animate={{ rotate: [0, 18, -12, 18, 0] }}
-                transition={{ duration: 1.1, repeat: Infinity, repeatDelay: 1.8 }}
+              {/* Hand */}
+              <motion.div
+                animate={{ y: [0, -6, 0] }}
+                transition={{ repeat: Infinity, duration: 1.4 }}
+                className="absolute -bottom-10 left-1/2 flex h-14 w-14 -translate-x-1/2 items-center justify-center rounded-full bg-indigo-500 text-white shadow-lg"
               >
                 👋
-              </motion.span>
-            </div>
+              </motion.div>
+            </motion.div>
+          </div>
+
+          {/* RIGHT */}
+          <div className="hidden md:block text-right">
+            <h2 className="text-6xl font-semibold text-white/10">
+              SYSTEMS
+            </h2>
+            <p className="mt-4 text-sm text-white/50">
+              Roadmaps, experimentation, LLM workflows,
+              and shipping discipline.
+              <br />
+              Less hype. More outcomes.
+            </p>
           </div>
         </div>
       </div>
     </section>
   );
 }
-
