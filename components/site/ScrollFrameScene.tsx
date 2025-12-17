@@ -54,7 +54,7 @@ export function ScrollFrameScene() {
 
   // Use ONE image path and keep it always defined (fixes the TS build error).
   // Put this file in: /public/rohan.jpg  (or change the path below)
-  const heroImageSrc = "/rohan.jpg";
+  const heroImageSrc = "/rohan.png";
 
   // Just keeping memo to avoid recalcs, not required
   const noteText = useMemo(
