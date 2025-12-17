@@ -1,264 +1,294 @@
 "use client";
 
-import Image from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
-import React, { useMemo, useRef } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { useMemo, useRef } from "react";
 
-type Capability = {
-  title: string;
-  desc: string;
-};
+const HERO_IMAGE_SRC = "/rohan.png";
 
-const CAPABILITIES: Capability[] = [
-  {
-    title: "Product sense",
-    desc: "Turn vague problems into clear goals, user segments, and measurable outcomes.",
-  },
-  {
-    title: "AI product strategy",
-    desc: "Pick the right approach, define success metrics, and ship iteratively.",
-  },
-  {
-    title: "Roadmaps and execution",
-    desc: "Translate strategy into milestones, experiments, and delivery plans.",
-  },
-  {
-    title: "Stakeholder alignment",
-    desc: "Write crisp docs, run clean meetings, and drive decisions with evidence.",
-  },
-];
+function cn(...classes: Array<string | false | undefined | null>) {
+  return classes.filter(Boolean).join(" ");
+}
 
 export function ScrollFrameScene() {
   const sectionRef = useRef<HTMLElement | null>(null);
 
-  // Scroll progress across this whole scene
+  // This drives both the "traveling card" and the reveal of the next content.
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ["start start", "end end"],
+    offset: ["start start", "end start"],
   });
 
-  // Responsive-ish movement (works well on desktop, still okay on mobile)
-  const cardX = useTransform(scrollYProgress, [0.0, 0.55, 1.0], [0, 0, 420]);
-  const cardY = useTransform(scrollYProgress, [0.0, 0.55, 1.0], [0, 0, 10]);
+  // Card motion: starts centered-ish, then moves to the right side as you scroll.
+  const cardX = useTransform(scrollYProgress, [0, 0.55, 1], ["0%", "0%", "34%"]);
+  const cardY = useTransform(scrollYProgress, [0, 0.45, 1], ["0px", "120px", "0px"]);
+  const cardRotate = useTransform(scrollYProgress, [0, 0.55, 1], ["-10deg", "-6deg", "8deg"]);
+  const cardScale = useTransform(scrollYProgress, [0, 0.6, 1], [1, 0.98, 0.92]);
 
-  const cardScale = useTransform(scrollYProgress, [0.0, 0.3, 1.0], [1, 1, 0.92]);
-  const cardRotate = useTransform(scrollYProgress, [0.0, 0.55, 1.0], [-8, -8, 10]);
-  const cardOpacity = useTransform(scrollYProgress, [0.0, 0.08], [1, 1]);
+  // Hero copy fades out slightly as we scroll into the sticky scene.
+  const heroFade = useTransform(scrollYProgress, [0, 0.25, 0.45], [1, 0.9, 0.6]);
+  const heroBlur = useTransform(scrollYProgress, [0, 0.35, 0.6], [0, 2, 6]);
 
-  // Left content appears only after the card starts moving to the right
-  const leftOpacity = useTransform(scrollYProgress, [0.45, 0.62], [0, 1]);
-  const leftY = useTransform(scrollYProgress, [0.45, 0.62], [18, 0]);
+  // Left content fades in when card starts moving to the right.
+  const leftContentOpacity = useTransform(scrollYProgress, [0.45, 0.62, 1], [0, 1, 1]);
+  const leftContentY = useTransform(scrollYProgress, [0.45, 0.62, 1], [18, 0, 0]);
 
-  // Soft fade for the big hero words when you transition into the next content
-  const heroFade = useTransform(scrollYProgress, [0.0, 0.35, 0.55], [1, 1, 0]);
+  // A subtle background glow that matches the image vibe (orange left, blue right).
+  const bgGlowOpacity = useTransform(scrollYProgress, [0, 0.6, 1], [1, 0.9, 0.75]);
 
-  // Use ONE image path and keep it always defined (fixes the TS build error).
-  // Put this file in: /public/rohan.jpg  (or change the path below)
-  const heroImageSrc = "/rohan.png";
-
-  // Just keeping memo to avoid recalcs, not required
-  const noteText = useMemo(
-    () => ({
-      title: "NOTE",
-      body:
-        "This card travels from the hero into this sticky section. Replace this note with a mini case study preview later.",
-      footer:
-        "Next: we can swap the placeholder content inside the card to show a real project preview.",
-    }),
-    []
+  const heroBadges = useMemo(
+    () => ["AI Product", "Automation Systems", "Applied GenAI", "Outbound Intelligence"],
+    [],
   );
 
   return (
-    <section
-      ref={(el) => {
-        sectionRef.current = el;
-      }}
-      className="relative bg-neutral-950 text-white"
-      style={{
-        // Long scroll region to drive the animation
-        minHeight: "220vh",
-      }}
-    >
-      {/* Background glow */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -left-40 top-[-200px] h-[520px] w-[520px] rounded-full bg-indigo-500/20 blur-[110px]" />
-        <div className="absolute -right-40 top-[-140px] h-[520px] w-[520px] rounded-full bg-cyan-500/15 blur-[120px]" />
-        <div className="absolute bottom-[-260px] left-1/3 h-[520px] w-[520px] rounded-full bg-purple-500/10 blur-[140px]" />
-      </div>
+    <main className="bg-[#070A10] text-white">
+      {/* Sticky scene wrapper */}
+      <section
+        ref={(node) => {
+          sectionRef.current = node;
+        }}
+        className="relative"
+      >
+        {/* This gives us scroll distance for the sticky animation */}
+        <div className="h-[220vh]">
+          <div className="sticky top-0 h-screen overflow-hidden">
+            {/* Background */}
+            <motion.div className="absolute inset-0" style={{ opacity: bgGlowOpacity }}>
+              <div className="absolute inset-0 bg-[#070A10]" />
 
-      {/* Sticky stage */}
-      <div className="sticky top-0 h-screen">
-        <div className="mx-auto flex h-full max-w-6xl items-center px-6">
-          <div className="relative grid w-full grid-cols-12 items-center gap-8">
-            {/* HERO TEXT (fades out later) */}
-            <motion.div
-              style={{ opacity: heroFade }}
-              className="col-span-12 md:col-span-7"
-            >
-              <div className="text-xs tracking-[0.22em] text-white/60">ROHAN JETHA</div>
+              {/* Orange glow (left) */}
+              <div className="pointer-events-none absolute -left-40 top-[-220px] h-[700px] w-[700px] rounded-full bg-orange-500/20 blur-[120px]" />
 
-              <div className="mt-5 leading-[0.9]">
-                <div className="text-5xl font-semibold md:text-7xl">AI</div>
-                <div className="text-5xl font-semibold md:text-7xl">PRODUCT</div>
-              </div>
+              {/* Blue glow (right) */}
+              <div className="pointer-events-none absolute -right-40 top-[-260px] h-[760px] w-[760px] rounded-full bg-sky-500/20 blur-[130px]" />
 
-              <p className="mt-5 max-w-xl text-sm leading-6 text-white/70 md:text-base">
-                I build AI enabled products with crisp problem framing, measurable outcomes,
-                and practical execution.
-              </p>
+              {/* Subtle vignette */}
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/10 via-black/40 to-black/80" />
+            </motion.div>
 
-              <div className="mt-6 flex flex-wrap items-center gap-3">
-                <a
-                  href="#work"
-                  className="rounded-full bg-white px-5 py-2 text-sm font-medium text-neutral-950 hover:bg-white/90"
-                >
-                  View work
-                </a>
-                <a
+            {/* NAV */}
+            <div className="relative z-20 mx-auto flex max-w-6xl justify-center px-4 pt-6">
+              <div className="flex w-full max-w-3xl items-center justify-between rounded-full bg-white/70 px-3 py-2 shadow-[0_20px_60px_rgba(0,0,0,0.25)] backdrop-blur-xl">
+                <div className="flex items-center gap-3">
+                  <div className="relative h-8 w-8 overflow-hidden rounded-full bg-black">
+                    <Image src={HERO_IMAGE_SRC} alt="Rohan" fill className="object-cover" priority />
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-black/80">
+                    <span className="font-medium">Available for work</span>
+                    <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                  </div>
+                </div>
+
+                <nav className="hidden items-center gap-7 text-sm text-black/60 md:flex">
+                  <Link className="hover:text-black" href="#home">
+                    Home
+                  </Link>
+                  <Link className="hover:text-black" href="#about">
+                    About
+                  </Link>
+                  <Link className="hover:text-black" href="#projects">
+                    Projects
+                  </Link>
+                  <Link className="hover:text-black" href="#blogs">
+                    Blogs
+                  </Link>
+                </nav>
+
+                <Link
                   href="#contact"
-                  className="rounded-full border border-white/20 bg-white/5 px-5 py-2 text-sm font-medium text-white hover:bg-white/10"
+                  className="rounded-full bg-black px-5 py-2 text-sm font-medium text-white"
                 >
                   Contact
-                </a>
+                </Link>
               </div>
-            </motion.div>
+            </div>
 
-            {/* BIG RIGHT WORDS (also fades out later) */}
-            <motion.div
-              style={{ opacity: heroFade }}
-              className="pointer-events-none col-span-12 hidden md:col-span-5 md:block"
-            >
-              <div className="text-right text-6xl font-semibold tracking-tight text-white/15">
-                SYSTEMS
-              </div>
-              <div className="mt-3 text-right text-sm leading-6 text-white/45">
-                Roadmaps, experimentation, LLM workflows, and shipping discipline.
-                Less hype, more outcomes.
-              </div>
-            </motion.div>
+            {/* HERO CONTENT */}
+            <div id="home" className="relative z-10 mx-auto max-w-6xl px-4 pt-14">
+              <motion.div style={{ opacity: heroFade, filter: heroBlur.to((v) => `blur(${v}px)`) }}>
+                <div className="grid items-start gap-10 md:grid-cols-2">
+                  {/* Left hero copy */}
+                  <div className="pt-8">
+                    <div className="text-xs tracking-[0.35em] text-white/60">ROHAN JETHA</div>
 
-            {/* CENTER "HI" BUTTON */}
-            <motion.div
-              style={{ opacity: heroFade }}
-              className="pointer-events-none absolute left-1/2 top-[66%] -translate-x-1/2 md:top-1/2"
-            >
-              <div className="pointer-events-auto">
-                <motion.button
-                  type="button"
-                  className="grid h-12 w-12 place-items-center rounded-full bg-indigo-500 shadow-lg shadow-indigo-500/25"
-                  animate={{ rotate: [0, 12, -10, 12, 0] }}
-                  transition={{ duration: 1.6, repeat: Infinity, repeatDelay: 1.2 }}
-                  aria-label="Hi"
-                >
-                  <span className="text-lg">👋</span>
-                </motion.button>
-              </div>
-            </motion.div>
+                    <h1 className="mt-6 text-[52px] font-semibold leading-[0.92] tracking-[-0.04em] md:text-[80px]">
+                      AI
+                      <br />
+                      PRODUCT
+                    </h1>
 
-            {/* TRAVELING CARD (always present, starts in hero center, ends on right) */}
-            <div className="pointer-events-none absolute left-1/2 top-[72%] -translate-x-1/2 md:top-1/2">
+                    <p className="mt-6 max-w-md text-[15px] leading-7 text-white/70">
+                      I build AI-enabled products with crisp problem framing, measurable outcomes, and
+                      practical execution.
+                    </p>
+
+                    <div className="mt-6 flex flex-wrap gap-2">
+                      {heroBadges.map((b) => (
+                        <span
+                          key={b}
+                          className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70"
+                        >
+                          {b}
+                        </span>
+                      ))}
+                    </div>
+
+                    <div className="mt-8 flex items-center gap-3">
+                      <Link
+                        href="#projects"
+                        className="rounded-full bg-white px-5 py-2 text-sm font-medium text-black"
+                      >
+                        View work
+                      </Link>
+                      <Link
+                        href="#contact"
+                        className="rounded-full border border-white/15 bg-white/5 px-5 py-2 text-sm font-medium text-white/90"
+                      >
+                        Contact
+                      </Link>
+                    </div>
+                  </div>
+
+                  {/* Right hero word */}
+                  <div className="hidden md:block pt-10 text-right">
+                    <div className="text-[64px] font-semibold tracking-[-0.02em] text-white/10">
+                      SYSTEMS
+                    </div>
+                    <p className="ml-auto mt-2 max-w-sm text-sm leading-6 text-white/45">
+                      Roadmaps, experimentation, LLM workflows, and shipping discipline.
+                      <br />
+                      Less hype, more outcomes.
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* TRAVELING CARD + HAND */}
+            <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
               <motion.div
                 style={{
                   x: cardX,
                   y: cardY,
                   rotate: cardRotate,
                   scale: cardScale,
-                  opacity: cardOpacity,
                 }}
-                className="pointer-events-auto relative h-[360px] w-[260px] md:h-[420px] md:w-[300px]"
+                className="pointer-events-auto relative"
               >
-                <div className="absolute inset-0 rounded-[28px] bg-white shadow-2xl shadow-black/35" />
-                <div className="absolute inset-[10px] overflow-hidden rounded-[22px] bg-neutral-100">
-                  {/* Top browser dots */}
-                  <div className="flex items-center gap-2 px-4 py-3">
-                    <div className="h-2.5 w-2.5 rounded-full bg-neutral-300" />
-                    <div className="h-2.5 w-2.5 rounded-full bg-neutral-300" />
-                    <div className="h-2.5 w-2.5 rounded-full bg-neutral-300" />
-                  </div>
+                {/* Image card (no fake frame) */}
+                <div
+                  className={cn(
+                    "relative h-[360px] w-[280px] md:h-[460px] md:w-[360px]",
+                    "overflow-hidden rounded-[26px]",
+                    "shadow-[0_30px_90px_rgba(0,0,0,0.55)]",
+                    "bg-black/20",
+                  )}
+                >
+                  <Image
+                    src={HERO_IMAGE_SRC}
+                    alt="Rohan portrait"
+                    fill
+                    priority
+                    className="object-cover"
+                  />
 
-                  <div className="relative h-[calc(100%-44px)] w-full">
-                    <Image
-                      src={heroImageSrc}
-                      alt="Portrait"
-                      fill
-                      priority
-                      className="object-cover"
-                      sizes="(max-width: 768px) 260px, 300px"
-                    />
-                  </div>
+                  {/* Soft highlight */}
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-black/35 via-transparent to-white/10" />
                 </div>
+
+                {/* Animated hand under the card */}
+                <motion.button
+                  type="button"
+                  aria-label="Hi"
+                  className="pointer-events-auto absolute left-1/2 top-full mt-6 flex h-14 w-14 -translate-x-1/2 items-center justify-center rounded-full bg-indigo-500 shadow-[0_18px_60px_rgba(79,70,229,0.55)]"
+                  animate={{ rotate: [0, 12, -10, 12, 0] }}
+                  transition={{ duration: 1.4, repeat: Infinity, repeatDelay: 1.2, ease: "easeInOut" }}
+                >
+                  <span className="text-xl">👋</span>
+                </motion.button>
               </motion.div>
             </div>
 
-            {/* LEFT CONTENT (appears later when card is on the right) */}
+            {/* LEFT CONTENT THAT APPEARS WHEN CARD MOVES RIGHT */}
             <motion.div
-              style={{ opacity: leftOpacity, y: leftY }}
-              className="col-span-12 mt-[56vh] md:col-span-7 md:mt-0"
+              className="absolute inset-x-0 bottom-10 z-20 mx-auto max-w-6xl px-4"
+              style={{ opacity: leftContentOpacity, y: leftContentY }}
             >
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/75">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                Available for work
-              </div>
+              <div className="grid gap-6 md:grid-cols-[1.3fr_1fr]">
+                <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur">
+                  <div className="text-xs tracking-[0.35em] text-white/60">CAPABILITIES</div>
+                  <h2 className="mt-3 text-3xl font-semibold tracking-[-0.02em]">
+                    What I can do for you
+                  </h2>
+                  <p className="mt-3 max-w-xl text-sm leading-6 text-white/70">
+                    Dummy copy for now. This block is meant to sit on the left while the portrait
+                    travels to the right. Replace later with real services and proof.
+                  </p>
 
-              <div className="mt-5 text-xs tracking-[0.22em] text-white/60">
-                CAPABILITIES
-              </div>
-
-              <h2 className="mt-3 text-3xl font-semibold md:text-4xl">
-                What I can do for you
-              </h2>
-
-              <p className="mt-3 max-w-xl text-sm leading-6 text-white/70 md:text-base">
-                Dummy copy for now. This section mirrors the reference layout and gives us a
-                clean target for the scroll linked card animation.
-              </p>
-
-              <div className="mt-8 divide-y divide-white/10 rounded-2xl border border-white/10 bg-white/[0.04]">
-                {CAPABILITIES.map((c, idx) => (
-                  <div key={c.title} className="flex items-start gap-4 px-6 py-5">
-                    <div className="flex-1">
-                      <div className="font-medium">{c.title}</div>
-                      <div className="mt-1 text-sm leading-6 text-white/65">
-                        {c.desc}
+                  <div className="mt-6 space-y-4">
+                    {[
+                      ["Product sense", "Turn vague problems into clear goals, user segments, and measurable outcomes."],
+                      ["AI product strategy", "Pick the right model approach, define success metrics, and ship iteratively."],
+                      ["Roadmaps and execution", "Translate strategy into milestones, experiments, and delivery plans."],
+                      ["Stakeholder alignment", "Write crisp docs, run clean meetings, and drive decisions with evidence."],
+                    ].map(([title, desc]) => (
+                      <div
+                        key={title}
+                        className="flex items-start justify-between gap-6 border-t border-white/10 pt-4"
+                      >
+                        <div>
+                          <div className="font-medium">{title}</div>
+                          <div className="mt-1 text-sm text-white/65">{desc}</div>
+                        </div>
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full border border-white/15 bg-white/5 text-xs text-white/70">
+                          ↑
+                        </div>
                       </div>
-                    </div>
-                    <div className="grid h-9 w-9 place-items-center rounded-full border border-white/10 bg-white/[0.03] text-white/70">
-                      {idx + 1}
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur">
+                  <div className="flex items-center justify-between">
+                    <div className="text-xs font-medium tracking-[0.25em] text-white/60">NOTE</div>
+                    <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70">
+                      Available for work <span className="ml-2 inline-block h-2 w-2 rounded-full bg-emerald-500" />
                     </div>
                   </div>
-                ))}
-              </div>
-            </motion.div>
 
-            {/* RIGHT NOTE (appears with left content) */}
-            <motion.div
-              style={{ opacity: leftOpacity, y: leftY }}
-              className="col-span-12 mt-6 md:col-span-5 md:mt-0"
-            >
-              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-6">
-                <div className="text-xs tracking-[0.2em] text-white/60">
-                  {noteText.title}
+                  <p className="mt-4 text-sm leading-6 text-white/70">
+                    The traveling portrait is controlled by the sticky scroll scene. This card is a
+                    placeholder for a future case study preview, testimonial, or featured project.
+                  </p>
+
+                  <div className="mt-6 rounded-2xl border border-white/10 bg-black/20 p-4">
+                    <div className="text-sm font-medium">Next</div>
+                    <div className="mt-1 text-sm text-white/65">
+                      Swap the portrait for a real project card, then keep the same scroll motion.
+                    </div>
+                  </div>
                 </div>
-                <p className="mt-3 text-sm leading-6 text-white/70">{noteText.body}</p>
-                <div className="my-5 h-px w-full bg-white/10" />
-                <p className="text-sm leading-6 text-white/70">{noteText.footer}</p>
               </div>
             </motion.div>
           </div>
         </div>
-      </div>
 
-      {/* Spacer tail so you can scroll past the sticky section cleanly */}
-      <div className="mx-auto max-w-6xl px-6 pb-24 pt-10">
-        <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-8">
-          <div className="text-xs tracking-[0.22em] text-white/60">NEXT</div>
-          <h3 className="mt-3 text-2xl font-semibold">More sections go here</h3>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-white/70">
-            Once the scroll animation feels right, we can build Projects, About, and Blog in
-            the same dark style as the rest of the site.
-          </p>
+        {/* After the sticky scene */}
+        <div id="projects" className="relative bg-[#070A10]">
+          <div className="mx-auto max-w-6xl px-4 py-24">
+            <div className="text-xs tracking-[0.35em] text-white/60">NEXT</div>
+            <h3 className="mt-3 text-3xl font-semibold tracking-[-0.02em]">
+              More sections go here
+            </h3>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-white/70">
+              Once the scroll animation feels right, we can build Projects, About, and Blog sections
+              in the same dark style.
+            </p>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </main>
   );
 }
