@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 
 export function Hero() {
@@ -31,7 +32,7 @@ export function Hero() {
                 BUILDER
               </div>
 
-              {/* Center "photo" card */}
+              {/* Center image card */}
               <motion.div
                 className="absolute left-1/2 top-[130px] w-[260px] -translate-x-1/2 md:w-[320px]"
                 initial={{ opacity: 0, y: 14, rotate: -6 }}
@@ -47,18 +48,33 @@ export function Hero() {
                 }}
               >
                 <div className="relative overflow-hidden rounded-3xl border border-white/12 bg-black/40 shadow-[0_30px_80px_rgba(0,0,0,0.55)] backdrop-blur">
-                  {/* No image needed: clean placeholder that still looks premium */}
-                  <div className="aspect-[3/4] w-full bg-gradient-to-br from-white/10 via-white/5 to-transparent" />
+                  {/* Keep aspect ratio, then fill with Image */}
+                  <div className="relative aspect-[3/4] w-full">
+                    <Image
+                      src="/rohan.jpg"
+                      alt="Rohan portrait"
+                      fill
+                      priority
+                      className="object-cover"
+                      sizes="(max-width: 768px) 260px, 320px"
+                    />
 
-                  {/* Subtle highlight */}
-                  <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.14),transparent_45%)]" />
+                    {/* Subtle dark overlay for premium look on dark UI */}
+                    <div className="pointer-events-none absolute inset-0 bg-black/15" />
+
+                    {/* Subtle highlight */}
+                    <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.14),transparent_45%)]" />
+                  </div>
                 </div>
 
                 {/* Waving button */}
                 <div className="absolute -bottom-8 left-10">
-                  <div className="relative">
-                    <div className="h-20 w-20 rounded-full bg-indigo-500 shadow-[0_18px_55px_rgba(99,102,241,0.35)]" />
-                    <div className="absolute inset-0 flex items-center justify-center">
+                  <button
+                    type="button"
+                    aria-label="Say hi"
+                    className="relative h-20 w-20 rounded-full bg-indigo-500 shadow-[0_18px_55px_rgba(99,102,241,0.35)]"
+                  >
+                    <span className="absolute inset-0 flex items-center justify-center">
                       <motion.span
                         className="text-3xl"
                         animate={{ rotate: [0, 18, -12, 18, 0] }}
@@ -71,8 +87,8 @@ export function Hero() {
                       >
                         👋
                       </motion.span>
-                    </div>
-                  </div>
+                    </span>
+                  </button>
                 </div>
               </motion.div>
 
