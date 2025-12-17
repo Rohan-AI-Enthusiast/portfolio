@@ -60,7 +60,8 @@ export function Hero() {
             </div>
 
             <div className="relative">
-              <div className="fusion-card fusion-glow p-6 md:p-8">
+              <div className="relative">
+              className="fusion-card absolute -left-8 -top-10 hidden w-[260px] p-4 lg:block z-20"
                 <div className="flex items-center justify-between">
                   <div className="text-sm font-medium text-white/85">
                     Proactive Outbound Intelligence
@@ -104,7 +105,7 @@ export function Hero() {
               </motion.div>
 
               <motion.div
-                className="fusion-card fusion-glow2 absolute -bottom-6 -right-3 hidden w-[260px] p-4 lg:block"
+                className="fusion-card fusion-glow2 absolute -bottom-10 -right-8 hidden w-[300px] p-4 lg:block z-30"
                 animate={{ y: [0, 12, 0] }}
                 transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
               >
