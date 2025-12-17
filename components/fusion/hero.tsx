@@ -2,140 +2,107 @@
 
 import { motion } from "framer-motion";
 
-type Badge = { label: string };
-
-const heroBadges: Badge[] = [
-  { label: "AI Product" },
-  { label: "Automation Systems" },
-  { label: "Applied GenAI" },
-  { label: "Outbound Intelligence" },
-];
-
 export function Hero() {
   return (
-    <section className="pt-10">
-      <div className="fusion-hero-bg fusion-card fusion-glow border border-white/14">
-        <div className="fusion-hero-inner p-6 md:p-10">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/80">
-            <span className="h-2 w-2 rounded-full bg-emerald-400/80" />
-            Building AI products that ship
-          </div>
-
-          <div className="mt-5 grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-center">
-            <div>
-              <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
-                AI systems that feel like a product, not a demo
-              </h1>
-
-              <p className="mt-4 max-w-xl text-base leading-7 text-white/70">
-                I design and build automation driven workflows with clear
-                reasoning, measurable impact, and a clean UI layer on top.
-              </p>
-
-              <div className="mt-6 flex flex-wrap gap-2">
-                {heroBadges.map((b) => (
-                  <span
-                    key={b.label}
-                    className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/75"
-                  >
-                    {b.label}
-                  </span>
-                ))}
-              </div>
-
-              <div className="mt-8 flex flex-wrap items-center gap-3">
-                <a
-                  href="#work"
-                  className="rounded-xl bg-white px-4 py-2 text-sm font-medium text-black hover:bg-white/90"
-                >
-                  View case studies
-                </a>
-                <a
-                  href="#contact"
-                  className="rounded-xl border border-white/12 bg-white/5 px-4 py-2 text-sm font-medium text-white/85 hover:bg-white/10"
-                >
-                  Contact
-                </a>
-              </div>
+    <section id="home" className="relative pb-20 pt-10">
+      <div className="mx-auto w-full max-w-6xl px-5">
+        {/* Hero frame */}
+        <div className="fusion-hero-bg fusion-card fusion-glow border border-white/14">
+          <div className="fusion-hero-inner relative px-6 py-10 md:px-10 md:py-14">
+            {/* Top badge */}
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/80">
+              <span className="h-2 w-2 rounded-full bg-emerald-400/80" />
+              Building AI products that ship
             </div>
 
-            <div className="relative">
-              {/* Main card */}
-              <div className="fusion-card fusion-glow relative z-10 p-6 md:p-8">
-                <div className="flex items-center justify-between">
-                  <div className="text-sm font-medium text-white/85">
-                    Proactive Outbound Intelligence
+            {/* Big type layout */}
+            <div className="relative mt-10 min-h-[460px]">
+              <div className="pointer-events-none absolute left-0 top-[70px] text-[64px] font-semibold leading-none tracking-tight text-white md:text-[92px]">
+                AI
+              </div>
+
+              <div className="pointer-events-none absolute left-0 top-[150px] max-w-[520px] text-[44px] font-semibold leading-[0.98] tracking-tight text-white md:text-[76px]">
+                systems that feel like
+                <br />
+                a product
+              </div>
+
+              <div className="pointer-events-none absolute right-0 top-[110px] text-right text-[54px] font-semibold leading-none tracking-tight text-white md:text-[96px]">
+                BUILDER
+              </div>
+
+              {/* Center "photo" card */}
+              <motion.div
+                className="absolute left-1/2 top-[130px] w-[260px] -translate-x-1/2 md:w-[320px]"
+                initial={{ opacity: 0, y: 14, rotate: -6 }}
+                animate={{
+                  opacity: 1,
+                  y: [0, -8, 0],
+                  rotate: [-6, -4.5, -6],
+                }}
+                transition={{
+                  opacity: { duration: 0.5 },
+                  y: { duration: 7, repeat: Infinity, ease: "easeInOut" },
+                  rotate: { duration: 7, repeat: Infinity, ease: "easeInOut" },
+                }}
+              >
+                <div className="relative overflow-hidden rounded-3xl border border-white/12 bg-black/40 shadow-[0_30px_80px_rgba(0,0,0,0.55)] backdrop-blur">
+                  {/* No image needed: clean placeholder that still looks premium */}
+                  <div className="aspect-[3/4] w-full bg-gradient-to-br from-white/10 via-white/5 to-transparent" />
+
+                  {/* Subtle highlight */}
+                  <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.14),transparent_45%)]" />
+                </div>
+
+                {/* Waving button */}
+                <div className="absolute -bottom-8 left-10">
+                  <div className="relative">
+                    <div className="h-20 w-20 rounded-full bg-indigo-500 shadow-[0_18px_55px_rgba(99,102,241,0.35)]" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <motion.span
+                        className="text-3xl"
+                        animate={{ rotate: [0, 18, -12, 18, 0] }}
+                        transition={{
+                          duration: 1.1,
+                          repeat: Infinity,
+                          repeatDelay: 1.4,
+                          ease: "easeInOut",
+                        }}
+                      >
+                        👋
+                      </motion.span>
+                    </div>
                   </div>
-                  <div className="text-xs text-white/50">V1</div>
                 </div>
+              </motion.div>
 
-                <div className="mt-4 grid grid-cols-2 gap-3">
-                  <FeatureCard
-                    title="Lead scoring"
-                    desc="Consistent scoring rules across channels."
-                  />
-                  <FeatureCard
-                    title="Research briefs"
-                    desc="Fast context to personalize outreach."
-                  />
-                  <FeatureCard
-                    title="Pipeline view"
-                    desc="MQL to SQL tracking and notes."
-                  />
-                  <FeatureCard
-                    title="Cost control"
-                    desc="Token and run cost visibility."
-                  />
-                </div>
+              {/* Right caption */}
+              <div className="absolute right-0 top-[215px] max-w-[280px] text-right text-sm leading-6 text-white/70 md:text-base">
+                I design and build automation systems with clear reasoning,
+                measurable impact, and a clean UI layer on top.
               </div>
-
-              {/* Floating: Signal */}
-              <motion.div
-                className="fusion-card absolute -left-8 -top-10 hidden w-[260px] p-4 lg:block z-20"
-                animate={{ y: [0, -10, 0] }}
-                transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-              >
-                <div className="text-xs text-white/60">Signal</div>
-                <div className="mt-1 text-sm font-medium text-white/85">
-                  High intent account detected
-                </div>
-                <div className="mt-3 h-2 w-full rounded-full bg-white/10">
-                  <div className="h-2 w-[72%] rounded-full bg-blue-500/60" />
-                </div>
-                <div className="mt-2 text-xs text-white/50">Score: 72</div>
-              </motion.div>
-
-              {/* Floating: Draft */}
-              <motion.div
-                className="fusion-card fusion-glow2 absolute -bottom-10 -right-8 hidden w-[300px] p-4 lg:block z-30"
-                animate={{ y: [0, 12, 0] }}
-                transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-              >
-                <div className="text-xs text-white/60">Draft</div>
-                <div className="mt-1 text-sm font-medium text-white/85">
-                  Message personalization ready
-                </div>
-                <div className="mt-3 space-y-2">
-                  <div className="h-2 w-[92%] rounded bg-white/10" />
-                  <div className="h-2 w-[84%] rounded bg-white/10" />
-                  <div className="h-2 w-[76%] rounded bg-white/10" />
-                </div>
-              </motion.div>
             </div>
-          </div>
 
-          <div className="mt-14 border-t border-white/10" />
+            {/* CTAs */}
+            <div className="mt-10 flex flex-wrap items-center gap-3">
+              <a
+                href="#projects"
+                className="rounded-xl bg-white px-4 py-2 text-sm font-medium text-black hover:bg-white/90"
+              >
+                View projects
+              </a>
+              <a
+                href="#contact"
+                className="rounded-xl border border-white/12 bg-white/5 px-4 py-2 text-sm font-medium text-white/85 hover:bg-white/10"
+              >
+                Contact
+              </a>
+            </div>
+
+            <div className="mt-10 border-t border-white/10" />
+          </div>
         </div>
       </div>
     </section>
-  );
-}
-
-function FeatureCard(props: { title: string; desc: string }) {
-  return (
-    <div className="fusion-card p-4">
-      <div className="text-sm font-medium text-white/85">{props.title}</div>
-      <div className="mt-1 text-xs leading-5 text-white/55">{props.desc}</div>
-    </div>
   );
 }
