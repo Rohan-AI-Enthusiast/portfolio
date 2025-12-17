@@ -14,7 +14,7 @@ const heroBadges: Badge[] = [
 export function Hero() {
   return (
     <section className="pt-10">
-      <div className="fusion-hero-bg fusion-card fusion-glow">
+      <div className="fusion-hero-bg fusion-card fusion-glow border border-white/14">
         <div className="fusion-hero-inner p-6 md:p-10">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/80">
             <span className="h-2 w-2 rounded-full bg-emerald-400/80" />
