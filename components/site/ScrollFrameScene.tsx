@@ -1,249 +1,341 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
+import {
+  motion,
+  useMotionTemplate,
+  useScroll,
+  useTransform,
+} from "framer-motion";
 import { useMemo, useRef } from "react";
 
-const HERO_IMAGE_SRC = "/rohan.png";
+const HERO_IMAGE_SRC = "/rohan.png"; // in /public/rohan.png
 
-function cn(...classes: Array<string | false | undefined | null>) {
-  return classes.filter(Boolean).join(" ");
+function clamp01(n: number) {
+  if (n < 0) return 0;
+  if (n > 1) return 1;
+  return n;
 }
 
 export function ScrollFrameScene() {
-  const sectionRef = useRef<HTMLElement | null>(null);
+  const rootRef = useRef<HTMLDivElement | null>(null);
 
+  // This section controls the whole scroll-linked animation.
+  // Height gives us enough "scroll runway" to move the image from center to right.
   const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start start", "end start"],
+    target: rootRef,
+    offset: ["start start", "end end"],
   });
 
-  // Card motion
-  const cardX = useTransform(scrollYProgress, [0, 0.55, 1], ["0%", "0%", "34%"]);
-  const cardY = useTransform(scrollYProgress, [0, 0.45, 1], ["0px", "120px", "0px"]);
-  const cardRotate = useTransform(scrollYProgress, [0, 0.55, 1], ["-10deg", "-6deg", "8deg"]);
-  const cardScale = useTransform(scrollYProgress, [0, 0.6, 1], [1, 0.98, 0.92]);
+  // HERO fade + blur as you start scrolling
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.12], [1, 0]);
+  const heroBlurPx = useTransform(scrollYProgress, [0, 0.12], [0, 10]);
+  const heroBlur = useMotionTemplate`blur(${heroBlurPx}px)`;
 
-  // Hero fades (no blur to avoid MotionValue.to issues)
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.25, 0.45], [1, 0.9, 0.6]);
+  // Image "card" movement: center (hero) -> right (capabilities)
+  const cardX = useTransform(scrollYProgress, [0.05, 0.35], [0, 260]);
+  const cardY = useTransform(scrollYProgress, [0.05, 0.35], [0, 40]);
+  const cardRotate = useTransform(scrollYProgress, [0.05, 0.35], [0, 10]);
+  const cardScale = useTransform(scrollYProgress, [0.0, 0.18], [1, 0.95]);
 
-  // Left content reveal
-  const leftContentOpacity = useTransform(scrollYProgress, [0.45, 0.62, 1], [0, 1, 1]);
-  const leftContentY = useTransform(scrollYProgress, [0.45, 0.62, 1], [18, 0, 0]);
+  // When we enter the capabilities area, show left content
+  const capsOpacity = useTransform(scrollYProgress, [0.25, 0.38], [0, 1]);
+  const capsY = useTransform(scrollYProgress, [0.25, 0.38], [18, 0]);
 
-  // Background glow opacity
-  const bgGlowOpacity = useTransform(scrollYProgress, [0, 0.6, 1], [1, 0.9, 0.75]);
-
-  const heroBadges = useMemo(
-    () => ["AI Product", "Automation Systems", "Applied GenAI", "Outbound Intelligence"],
+  const navJumpLinks = useMemo(
+    () => [
+      { href: "#home", label: "Home" },
+      { href: "#about", label: "About" },
+      { href: "#projects", label: "Projects" },
+      { href: "#blogs", label: "Blogs" },
+    ],
     [],
   );
 
-  return (
-    <main className="bg-[#070A10] text-white">
-      <section
-        ref={(node) => {
-          sectionRef.current = node;
-        }}
-        className="relative"
-      >
-        <div className="h-[220vh]">
-          <div className="sticky top-0 h-screen overflow-hidden">
-            {/* Background */}
-            <motion.div className="absolute inset-0" style={{ opacity: bgGlowOpacity }}>
-              <div className="absolute inset-0 bg-[#070A10]" />
-              <div className="pointer-events-none absolute -left-40 top-[-220px] h-[700px] w-[700px] rounded-full bg-orange-500/20 blur-[120px]" />
-              <div className="pointer-events-none absolute -right-40 top-[-260px] h-[760px] w-[760px] rounded-full bg-sky-500/20 blur-[130px]" />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/10 via-black/40 to-black/80" />
-            </motion.div>
+  // Background gradient: orange on left, blue on right, dark overall
+  const heroBg = useMemo(() => {
+    return [
+      "radial-gradient(900px 600px at 12% 12%, rgba(255,140,64,0.35) 0%, rgba(0,0,0,0) 60%)",
+      "radial-gradient(900px 600px at 88% 20%, rgba(64,140,255,0.35) 0%, rgba(0,0,0,0) 60%)",
+      "radial-gradient(1100px 900px at 50% 85%, rgba(40,60,120,0.20) 0%, rgba(0,0,0,0) 60%)",
+      "linear-gradient(180deg, #07090F 0%, #06070B 45%, #05060A 100%)",
+    ].join(", ");
+  }, []);
 
-            {/* NAV */}
-            <div className="relative z-20 mx-auto flex max-w-6xl justify-center px-4 pt-6">
-              <div className="flex w-full max-w-3xl items-center justify-between rounded-full bg-white/70 px-3 py-2 shadow-[0_20px_60px_rgba(0,0,0,0.25)] backdrop-blur-xl">
+  // Keep overall site dark even if some global CSS is weird
+  const pageBg = "#05060A";
+
+  // Used to keep image always valid for Next/Image
+  const safeSrc = HERO_IMAGE_SRC;
+
+  return (
+    <div ref={rootRef} className="relative" style={{ background: pageBg }}>
+      {/* Total scroll runway */}
+      <div className="relative h-[240vh]">
+        {/* HERO */}
+        <section
+          id="home"
+          className="sticky top-0 z-0 h-screen overflow-hidden"
+          style={{ backgroundImage: heroBg }}
+        >
+          {/* subtle dark overlay for contrast */}
+          <div className="absolute inset-0 bg-black/35" />
+
+          {/* Nav (kept simple, matching your pill look) */}
+          <div className="pointer-events-none absolute left-0 right-0 top-6 z-40">
+            <div className="pointer-events-auto mx-auto flex max-w-6xl items-center justify-center px-4">
+              <div className="flex w-full items-center justify-between rounded-full bg-[#BFC3C9]/95 px-3 py-2 shadow-[0_18px_60px_rgba(0,0,0,0.35)] backdrop-blur">
                 <div className="flex items-center gap-3">
-                  <div className="relative h-8 w-8 overflow-hidden rounded-full bg-black">
-                    <Image src={HERO_IMAGE_SRC} alt="Rohan" fill className="object-cover" priority />
+                  <div className="relative h-9 w-9 overflow-hidden rounded-full">
+                    <Image
+                      src={safeSrc}
+                      alt="Rohan"
+                      fill
+                      className="object-cover"
+                      sizes="36px"
+                      priority
+                    />
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-black/80">
-                    <span className="font-medium">Available for work</span>
-                    <span className="h-2 w-2 rounded-full bg-emerald-500" />
+
+                  <div className="flex items-center gap-2 text-sm font-medium text-black/80">
+                    <span>Available for work</span>
+                    <span className="inline-flex h-2 w-2 rounded-full bg-emerald-500" />
                   </div>
                 </div>
 
-                <nav className="hidden items-center gap-7 text-sm text-black/60 md:flex">
-                  <Link className="hover:text-black" href="#home">
-                    Home
-                  </Link>
-                  <Link className="hover:text-black" href="#about">
-                    About
-                  </Link>
-                  <Link className="hover:text-black" href="#projects">
-                    Projects
-                  </Link>
-                  <Link className="hover:text-black" href="#blogs">
-                    Blogs
-                  </Link>
-                </nav>
+                <div className="hidden items-center gap-6 text-sm text-black/70 md:flex">
+                  {navJumpLinks.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="transition hover:text-black"
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
 
-                <Link href="#contact" className="rounded-full bg-black px-5 py-2 text-sm font-medium text-white">
-                  Contact
-                </Link>
+                <div className="flex items-center gap-2">
+                  <Link
+                    href="#contact"
+                    className="rounded-full bg-black px-5 py-2 text-sm font-semibold text-white"
+                  >
+                    Contact
+                  </Link>
+                </div>
               </div>
             </div>
+          </div>
 
-            {/* HERO CONTENT */}
-            <div id="home" className="relative z-10 mx-auto max-w-6xl px-4 pt-14">
-              <motion.div style={{ opacity: heroOpacity }}>
-                <div className="grid items-start gap-10 md:grid-cols-2">
-                  <div className="pt-8">
-                    <div className="text-xs tracking-[0.35em] text-white/60">ROHAN JETHA</div>
-
-                    <h1 className="mt-6 text-[52px] font-semibold leading-[0.92] tracking-[-0.04em] md:text-[80px]">
-                      AI
-                      <br />
-                      PRODUCT
-                    </h1>
-
-                    <p className="mt-6 max-w-md text-[15px] leading-7 text-white/70">
-                      I build AI-enabled products with crisp problem framing, measurable outcomes, and practical execution.
-                    </p>
-
-                    <div className="mt-6 flex flex-wrap gap-2">
-                      {heroBadges.map((b) => (
-                        <span
-                          key={b}
-                          className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70"
-                        >
-                          {b}
-                        </span>
-                      ))}
-                    </div>
-
-                    <div className="mt-8 flex items-center gap-3">
-                      <Link href="#projects" className="rounded-full bg-white px-5 py-2 text-sm font-medium text-black">
-                        View work
-                      </Link>
-                      <Link
-                        href="#contact"
-                        className="rounded-full border border-white/15 bg-white/5 px-5 py-2 text-sm font-medium text-white/90"
-                      >
-                        Contact
-                      </Link>
-                    </div>
-                  </div>
-
-                  <div className="hidden md:block pt-10 text-right">
-                    <div className="text-[64px] font-semibold tracking-[-0.02em] text-white/10">SYSTEMS</div>
-                    <p className="ml-auto mt-2 max-w-sm text-sm leading-6 text-white/45">
-                      Roadmaps, experimentation, LLM workflows, and shipping discipline.
-                      <br />
-                      Less hype, more outcomes.
-                    </p>
-                  </div>
+          {/* HERO content with same structure as Duncan layout */}
+          <motion.div
+            className="relative z-10 mx-auto flex h-full max-w-6xl items-center px-4"
+            style={{ opacity: heroOpacity, filter: heroBlur }}
+          >
+            <div className="relative w-full">
+              {/* big left text */}
+              <div className="absolute left-0 top-1/2 w-[38%] -translate-y-1/2">
+                <div className="text-xs tracking-[0.35em] text-white/60">
+                  ROHAN JETHA
                 </div>
-              </motion.div>
-            </div>
+                <div className="mt-4 text-[clamp(44px,6vw,84px)] font-extrabold leading-[0.88] text-white">
+                  ARTIFICIAL
+                  <br />
+                  INTELLIGENCE
+                </div>
+                <div className="mt-4 max-w-sm text-sm leading-6 text-white/70">
+                  I build AI enabled products that move from idea to outcome with
+                  clear strategy, fast iteration, and measurable impact.
+                </div>
 
-            {/* TRAVELING CARD + HAND */}
-            <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
-              <motion.div
-                style={{ x: cardX, y: cardY, rotate: cardRotate, scale: cardScale }}
-                className="pointer-events-auto relative"
-              >
-                <div
-                  className={cn(
-                    "relative h-[360px] w-[280px] md:h-[460px] md:w-[360px]",
-                    "overflow-hidden rounded-[26px]",
-                    "shadow-[0_30px_90px_rgba(0,0,0,0.55)]",
-                    "bg-black/20",
-                  )}
+                <div className="mt-6 flex items-center gap-3">
+                  <Link
+                    href="#projects"
+                    className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-black"
+                  >
+                    View work
+                  </Link>
+                  <Link
+                    href="#contact"
+                    className="rounded-full border border-white/25 bg-white/5 px-5 py-2 text-sm font-semibold text-white"
+                  >
+                    Contact
+                  </Link>
+                </div>
+              </div>
+
+              {/* big right text */}
+              <div className="absolute right-0 top-1/2 w-[38%] -translate-y-1/2 text-right">
+                <div className="text-[clamp(44px,6vw,84px)] font-extrabold leading-[0.88] text-white/14">
+                  LEADER
+                </div>
+                <div className="mt-4 text-sm leading-6 text-white/70">
+                  Roadmaps, experimentation, LLM workflows, and shipping
+                  discipline.
+                  <br />
+                  Less hype, more outcomes.
+                </div>
+              </div>
+
+              {/* centered image, straight, no frame */}
+              <div className="mx-auto flex w-full flex-col items-center justify-center">
+                <motion.div
+                  className="relative z-10"
+                  style={{
+                    x: cardX,
+                    y: cardY,
+                    rotate: cardRotate,
+                    scale: cardScale,
+                  }}
                 >
-                  <Image src={HERO_IMAGE_SRC} alt="Rohan portrait" fill priority className="object-cover" />
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-black/35 via-transparent to-white/10" />
-                </div>
+                  <div className="relative h-[360px] w-[280px] overflow-hidden rounded-[28px] shadow-[0_40px_120px_rgba(0,0,0,0.55)] md:h-[460px] md:w-[360px]">
+                    <Image
+                      src={safeSrc}
+                      alt="Rohan portrait"
+                      fill
+                      className="object-cover"
+                      sizes="(min-width: 768px) 360px, 280px"
+                      priority
+                    />
+                    <div className="absolute inset-0 ring-1 ring-white/10" />
+                  </div>
+                </motion.div>
 
-                <motion.button
-                  type="button"
-                  aria-label="Hi"
-                  className="pointer-events-auto absolute left-1/2 top-full mt-6 flex h-14 w-14 -translate-x-1/2 items-center justify-center rounded-full bg-indigo-500 shadow-[0_18px_60px_rgba(79,70,229,0.55)]"
+                {/* animated hand under image */}
+                <motion.div
+                  className="mt-8 flex h-14 w-14 items-center justify-center rounded-full bg-[#5B63FF] shadow-[0_18px_60px_rgba(91,99,255,0.35)]"
                   animate={{ rotate: [0, 12, -10, 12, 0] }}
-                  transition={{ duration: 1.4, repeat: Infinity, repeatDelay: 1.2, ease: "easeInOut" }}
+                  transition={{
+                    duration: 1.4,
+                    repeat: Infinity,
+                    repeatDelay: 1.2,
+                    ease: "easeInOut",
+                  }}
+                  aria-label="Hi"
+                  title="Hi"
                 >
-                  <span className="text-xl">👋</span>
-                </motion.button>
-              </motion.div>
+                  <span className="text-2xl">👋</span>
+                </motion.div>
+              </div>
             </div>
+          </motion.div>
+        </section>
 
-            {/* LEFT CONTENT */}
-            <motion.div
-              className="absolute inset-x-0 bottom-10 z-20 mx-auto max-w-6xl px-4"
-              style={{ opacity: leftContentOpacity, y: leftContentY }}
-            >
-              <div className="grid gap-6 md:grid-cols-[1.3fr_1fr]">
-                <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur">
-                  <div className="text-xs tracking-[0.35em] text-white/60">CAPABILITIES</div>
-                  <h2 className="mt-3 text-3xl font-semibold tracking-[-0.02em]">What I can do for you</h2>
-                  <p className="mt-3 max-w-xl text-sm leading-6 text-white/70">
-                    Dummy copy for now. This block is meant to sit on the left while the portrait travels to the right.
-                  </p>
+        {/* CAPABILITIES (dark theme, with left text when image reaches right) */}
+        <section
+          id="about"
+          className="relative z-10"
+          style={{ background: pageBg }}
+        >
+          <div className="mx-auto max-w-6xl px-4 py-24">
+            <div className="grid items-start gap-12 md:grid-cols-2">
+              {/* Left content reveals as you scroll */}
+              <motion.div style={{ opacity: capsOpacity, y: capsY }}>
+                <div className="text-xs tracking-[0.35em] text-white/60">
+                  CAPABILITIES
+                </div>
+                <h2 className="mt-4 text-4xl font-bold text-white">
+                  What I can do for you
+                </h2>
+                <p className="mt-4 max-w-xl text-sm leading-6 text-white/70">
+                  Dummy copy for now. This section appears as the image moves to
+                  the right, matching the reference layout and animation
+                  behavior.
+                </p>
 
-                  <div className="mt-6 space-y-4">
-                    {[
-                      ["Product sense", "Turn vague problems into clear goals, user segments, and measurable outcomes."],
-                      ["AI product strategy", "Pick the right model approach, define success metrics, and ship iteratively."],
-                      ["Roadmaps and execution", "Translate strategy into milestones, experiments, and delivery plans."],
-                      ["Stakeholder alignment", "Write crisp docs, run clean meetings, and drive decisions with evidence."],
-                    ].map(([title, desc]) => (
-                      <div key={title} className="flex items-start justify-between gap-6 border-t border-white/10 pt-4">
-                        <div>
-                          <div className="font-medium">{title}</div>
-                          <div className="mt-1 text-sm text-white/65">{desc}</div>
+                <div className="mt-10 divide-y divide-white/10 rounded-2xl border border-white/10 bg-white/5">
+                  {[
+                    {
+                      title: "Product sense",
+                      desc: "Turn vague problems into clear goals, segments, and measurable outcomes.",
+                    },
+                    {
+                      title: "AI product strategy",
+                      desc: "Pick the right model approach, define success metrics, and ship iteratively.",
+                    },
+                    {
+                      title: "Roadmaps and execution",
+                      desc: "Translate strategy into milestones, experiments, and delivery plans.",
+                    },
+                    {
+                      title: "Stakeholder alignment",
+                      desc: "Write crisp docs, run clean meetings, and drive decisions with evidence.",
+                    },
+                  ].map((item) => (
+                    <div
+                      key={item.title}
+                      className="flex items-start gap-4 px-6 py-5"
+                    >
+                      <div className="mt-1 flex h-7 w-7 items-center justify-center rounded-full border border-white/15 bg-white/5 text-xs text-white/80">
+                        ↑
+                      </div>
+                      <div>
+                        <div className="font-semibold text-white">
+                          {item.title}
                         </div>
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full border border-white/15 bg-white/5 text-xs text-white/70">
-                          ↑
+                        <div className="mt-1 text-sm text-white/65">
+                          {item.desc}
                         </div>
                       </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur">
-                  <div className="flex items-center justify-between">
-                    <div className="text-xs font-medium tracking-[0.25em] text-white/60">NOTE</div>
-                    <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70">
-                      Available for work <span className="ml-2 inline-block h-2 w-2 rounded-full bg-emerald-500" />
                     </div>
-                  </div>
+                  ))}
+                </div>
+              </motion.div>
 
+              {/* Right side "note card" */}
+              <motion.div style={{ opacity: capsOpacity, y: capsY }}>
+                <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-[0_30px_90px_rgba(0,0,0,0.35)]">
+                  <div className="text-xs font-semibold tracking-[0.25em] text-white/60">
+                    NOTE
+                  </div>
                   <p className="mt-4 text-sm leading-6 text-white/70">
-                    The traveling portrait is controlled by the sticky scroll scene. This card is a placeholder for a future
-                    case study preview, testimonial, or featured project.
+                    The portrait above is the same element you saw in the hero.
+                    It moves from center to the right as you scroll, then this
+                    left content fades in.
                   </p>
-
-                  <div className="mt-6 rounded-2xl border border-white/10 bg-black/20 p-4">
-                    <div className="text-sm font-medium">Next</div>
-                    <div className="mt-1 text-sm text-white/65">
-                      Swap the portrait for a real project card, then keep the same scroll motion.
-                    </div>
-                  </div>
+                  <div className="mt-6 h-px bg-white/10" />
+                  <p className="mt-6 text-sm leading-6 text-white/70">
+                    Next we can swap this placeholder copy with real sections
+                    like Projects, About, and Blog.
+                  </p>
                 </div>
-              </div>
-            </motion.div>
+              </motion.div>
+            </div>
           </div>
-        </div>
+        </section>
 
-        {/* After sticky */}
-        <div id="projects" className="relative bg-[#070A10]">
+        {/* Placeholder anchors */}
+        <section id="projects" className="relative z-10" style={{ background: pageBg }}>
           <div className="mx-auto max-w-6xl px-4 py-24">
-            <div className="text-xs tracking-[0.35em] text-white/60">NEXT</div>
-            <h3 className="mt-3 text-3xl font-semibold tracking-[-0.02em]">More sections go here</h3>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-white/70">
-              Once the scroll animation feels right, we can build Projects, About, and Blog sections in the same dark style.
+            <div className="text-xs tracking-[0.35em] text-white/60">PROJECTS</div>
+            <h3 className="mt-4 text-3xl font-bold text-white">Selected work</h3>
+            <p className="mt-4 max-w-2xl text-sm leading-6 text-white/70">
+              Placeholder content. We will build this properly after the hero and scroll animation feel perfect.
             </p>
           </div>
-        </div>
-      </section>
-    </main>
+        </section>
+
+        <section id="blogs" className="relative z-10" style={{ background: pageBg }}>
+          <div className="mx-auto max-w-6xl px-4 py-24">
+            <div className="text-xs tracking-[0.35em] text-white/60">BLOGS</div>
+            <h3 className="mt-4 text-3xl font-bold text-white">Writing</h3>
+            <p className="mt-4 max-w-2xl text-sm leading-6 text-white/70">
+              Placeholder content.
+            </p>
+          </div>
+        </section>
+
+        <section id="contact" className="relative z-10" style={{ background: pageBg }}>
+          <div className="mx-auto max-w-6xl px-4 py-24">
+            <div className="text-xs tracking-[0.35em] text-white/60">CONTACT</div>
+            <h3 className="mt-4 text-3xl font-bold text-white">Say hello</h3>
+            <p className="mt-4 max-w-2xl text-sm leading-6 text-white/70">
+              Placeholder content.
+            </p>
+          </div>
+        </section>
+      </div>
+    </div>
   );
 }
